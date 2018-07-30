@@ -30,7 +30,7 @@ import com.datastax.tika.model.MetadataObject;
 public class MetadataService {
 	private static Logger logger = LoggerFactory.getLogger(MetadataService.class);
 	private MetadataDao dao;
-    private FileSystemOperations ops = new FileSystemOperations();
+    private DSEFileSystemOperations ops = new DSEFileSystemOperations();
 
 	private CloseableHttpClient httpClient = HttpClients.createDefault();
 	private String startLocation;
