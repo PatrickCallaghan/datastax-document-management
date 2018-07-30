@@ -5,7 +5,7 @@ DSEFS (DataStax Enterprise file system) is a fault-tolerant, general-purpose, di
 This demo will load all the documents in a directory into DSEFS while extracting the metadata for indexing into DSE Search. It will also look in the links.txt to search for links that it can index. If it finds a github repository, it will index the README.md file.
 
 
-To run this project you will need to have a DataStax Enterprise instance running in SearchAnalytics mode with DSEFS enabled. You may need to change the min_fee_space when you enable DSEFS if running locally - https://docs.datastax.com/en/dse/6.0/dse-dev/datastax_enterprise/analytics/enablingDsefs.html
+To run this project you will need to have a DataStax Enterprise instance running in SearchAnalytics mode with DSEFS enabled. You may need to change the 'min_free_space' when you enable DSEFS if running locally - https://docs.datastax.com/en/dse/6.0/dse-dev/datastax_enterprise/analytics/enablingDsefs.html
 
 To create the schema, and the search core, run the following (you may need to change the contact points)
 
