@@ -7,18 +7,6 @@ This demo will load all the documents in a directory into DSEFS while extracting
 
 To run this project you will need to have a DataStax Enterprise instance running in SearchAnalytics mode with DSEFS enabled. You may need to change the min_fee_space when you enable DSEFS if running locally - https://docs.datastax.com/en/dse/6.0/dse-dev/datastax_enterprise/analytics/enablingDsefs.html
 
-To use DSEFS programmatically we need to add 2 jars to the maven project. 
-
-The first is the byos (bring your own spark) libs that contain the dsefs implementation classes. Note, I am using DSE 6.0.1, you may need to change this for your version. 
-
-	mvn install:install-file -Dfile=/Users/patrickcallaghan/dse-6.0.1/clients/dse-byos_2.11-6.0.1.jar -DgroupId=com.datastax -DartifactId=byos -Dversion=1.0 -Dpackaging=jar
-
-
-And the other is the standard scala libs for the version of scala from the byos above - in this case, 2.11. 
-
-	mvn install:install-file -Dfile=/Users/patrickcallaghan/tools/scala-library/scala-library-2.11.8.jar  -DgroupId=com.datastax -DartifactId=scala-library -Dversion=1.0 -Dpackagine=jar
-
-
 To create the schema, and the search core, run the following (you may need to change the contact points)
 
 	mvn clean compile exec:java -Dexec.mainClass="com.datastax.demo.SchemaSetup" -DcontactPoints=localhost
