@@ -103,7 +103,13 @@ public class Main {
 
         // get all the files from a directory
         File[] fList = directory.listFiles();
+        if (fList==null || fList.length == 0){
+        	logger.info(directoryName + " directory is empty");
+        	return resultList;
+        }
+        
         resultList.addAll(Arrays.asList(fList));
+        
         for (File file : fList) {
             if (file.isFile()) {
                 System.out.println(file.getAbsolutePath());

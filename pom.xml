@@ -4,20 +4,27 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.datastax.demo</groupId>
-	<artifactId>datastax-tika-demo</artifactId>
+	<artifactId>datastax-document-management</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
+	<repositories>
+		<repository>
+			<id>DataStax Public</id>
+			<url>https://repo.datastax.com/public-repos/</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
-    		<groupId>com.datastax</groupId>
-    		<artifactId>byos</artifactId>
-    		<version>1.0</version>
+			<groupId>com.datastax.dse</groupId>
+			<artifactId>dse-byos_2.11</artifactId>
+			<version>6.0.1</version>
 		</dependency>
 		<dependency>
-    		<groupId>com.datastax</groupId>
-    		<artifactId>scala-library</artifactId>
-    		<version>1.0</version>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>2.11.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.datastax.dse</groupId>
@@ -108,8 +115,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 			<plugin>
