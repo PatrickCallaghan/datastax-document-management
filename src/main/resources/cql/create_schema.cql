@@ -18,7 +18,7 @@ md_ map<text,text>
 
 CREATE SEARCH INDEX ON tika.metadata;
 
-ALTER SEARCH INDEX SCHEMA ON tika.metadata ADD types.fieldtype[@class='org.apache.solr.schema.TextField', @name='MyTextField'] WITH '{"analyzer":{"tokenizer":{"class":"solr.WhitespaceTokenizerFactory"}, "filter":[{"class": "solr.StandardFilterFactory"}, {"class": "solr.LowerCaseFilterFactory"},{"class": "solr.StopFilterFactory"}]}}';
+ALTER SEARCH INDEX SCHEMA ON tika.metadata ADD types.fieldtype[@class='org.apache.solr.schema.TextField', @name='MyTextField'] WITH '{"analyzer":{"tokenizer":{"class":"solr.StandardFilterFactory"}, "filter":[{"class": "solr.LowerCaseFilterFactory"}]}}';
 
 ALTER SEARCH INDEX SCHEMA ON tika.metadata SET field[@name='content']@type='MyTextField';
 
