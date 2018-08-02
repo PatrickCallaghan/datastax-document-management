@@ -29,6 +29,8 @@ import com.datastax.tika.model.MetadataObject;
 
 public class MetadataService {
 	private static Logger logger = LoggerFactory.getLogger(MetadataService.class);
+
+	private String dsefs_base_dir;
 	private MetadataDao dao;
     private DSEFileSystemOperations ops = new DSEFileSystemOperations();
 
@@ -37,6 +39,7 @@ public class MetadataService {
 
 	public MetadataService(String startLocation) {		
 		String contactPointsStr = PropertyHelper.getProperty("contactPoints", "localhost");
+		dsefs_base_dir = PropertyHelper.getProperty("dsefsBaseDir", "/files");
 		this.dao = new MetadataDao(contactPointsStr.split(","));
 		this.startLocation = startLocation;
 	}	
@@ -45,42 +48,40 @@ public class MetadataService {
 		return dao.getKeyspaces();
 	}
 
-	public MetadataObject processFile(File file) throws IOException, SAXException, TikaException {
-		
-		BodyContentHandler handler = new BodyContentHandler(-1);	 
-	    AutoDetectParser parser = new AutoDetectParser();
-	    Metadata metadata = new Metadata();
-	    MetadataObject metadataObject = new MetadataObject();
-	    
-	    try (InputStream stream = FileUtils.openInputStream(file)) {
-	        parser.parse(stream, handler, metadata);
-	        	        
-	        metadataObject.setLastModified(metadata.getDate(Metadata.LAST_MODIFIED));
-	        metadataObject.setContentType(metadata.get(Metadata.CONTENT_TYPE));
-	        metadataObject.setCreatedDate(metadata.getDate(Metadata.CREATION_DATE));
-	        metadataObject.setDocumentId(UUID.randomUUID().toString());
-	        metadataObject.setVersion(Double.parseDouble(metadata.get("pdf:PDFVersion") != null ? metadata.get("pdf:PDFVersion") : "0"));
-	        metadataObject.setContent(handler.toString());
-	        metadataObject.setLink(file.getAbsolutePath());
-	        metadataObject.setType("File");
-	        
-	        Map<String, String> metadataMap = new HashMap<String,String>();
-	        for (String name : metadata.names()){
-	        	metadataMap.put("md_" + name, metadata.get(name));   		        	
-	        }
-	        metadataObject.setMetadataMap(metadataMap);
-	        logger.info(metadata.toString());
-	    }	
-	    
-	    return metadataObject;
+	private MetadataObject extractMetadata(InputStream stream, final String link, final String type) throws TikaException, SAXException, IOException {
+		BodyContentHandler handler = new BodyContentHandler(-1);
+		AutoDetectParser parser = new AutoDetectParser();
+		Metadata metadata = new Metadata();
+		MetadataObject metadataObject = new MetadataObject();
+
+		parser.parse(stream, handler, metadata);
+
+		metadataObject.setLastModified(metadata.getDate(Metadata.LAST_MODIFIED));
+		metadataObject.setContentType(metadata.get(Metadata.CONTENT_TYPE));
+		metadataObject.setCreatedDate(metadata.getDate(Metadata.CREATION_DATE));
+		metadataObject.setDocumentId(UUID.randomUUID().toString());
+		metadataObject.setVersion(Double.parseDouble(metadata.get("pdf:PDFVersion") != null ? metadata.get("pdf:PDFVersion") : "0"));
+		metadataObject.setContent(handler.toString());
+		metadataObject.setLink(link);
+		metadataObject.setType(type);
+
+		Map<String, String> metadataMap = new HashMap<String,String>();
+		for (String name : metadata.names()){
+			metadataMap.put("md_" + name, metadata.get(name));
+		}
+		metadataObject.setMetadataMap(metadataMap);
+		logger.info(metadata.toString());
+
+		return metadataObject;
 	}
-	
+
+	public MetadataObject processFile(File file) throws IOException, SAXException, TikaException {
+	    try (InputStream stream = FileUtils.openInputStream(file)) {
+			return extractMetadata(stream, file.getAbsolutePath(), "File");
+	    }	
+	}
+
 	public MetadataObject processLink(URL url) throws IOException, SAXException, TikaException, URISyntaxException {
-		
-		BodyContentHandler handler = new BodyContentHandler(-1);	 
-	    AutoDetectParser parser = new AutoDetectParser();
-	    Metadata metadata = new Metadata();
-	    MetadataObject metadataObject = new MetadataObject();
 	    URL originalURL = url;
 	    
 	    if (url.toString().contains("https://github.com/")){
@@ -91,34 +92,21 @@ public class MetadataService {
 	    logger.info("Opening Stream to " + url.toString());
 	    
 	    try (InputStream stream = url.openStream()) {
-	        parser.parse(stream, handler, metadata);
-	        	        
-	        metadataObject.setLastModified(metadata.getDate(Metadata.LAST_MODIFIED));
-	        metadataObject.setContentType(metadata.get(Metadata.CONTENT_TYPE));
-	        metadataObject.setCreatedDate(metadata.getDate(Metadata.CREATION_DATE));
-	        metadataObject.setDocumentId(UUID.randomUUID().toString());
-	        metadataObject.setVersion(Double.parseDouble(metadata.get("pdf:PDFVersion") != null ? metadata.get("pdf:PDFVersion") : "0"));
-	        metadataObject.setContent(handler.toString());
-	        metadataObject.setLink(originalURL.toURI().toString());
-	        metadataObject.setType("URL");
-	        
-	        Map<String, String> metadataMap = new HashMap<String,String>();
-	        for (String name : metadata.names()){
-	        	metadataMap.put("md_" + name, metadata.get(name));   		        	
-	        }
-	        metadataObject.setMetadataMap(metadataMap);
-	        logger.info(metadata.toString());
-	    }	
-	    
-	    return metadataObject;
+			return extractMetadata(stream, originalURL.toURI().toString(), "URL");
+	    }
+	}
+
+	private String getDestination(File file) {
+		String dest = dsefs_base_dir + "/" + file.getAbsolutePath().substring(this.startLocation.length()+1);
+
+		return dest;
 	}
 	
 	public void sendFile(File source, MetadataObject metadata) {
-		
-	    	    
 	    try {
-			ops.addFile(source.getAbsolutePath(), source.getAbsolutePath().substring(this.startLocation.length()), getConf());
-			metadata.setLink(source.getAbsolutePath().substring(this.startLocation.length() + 1));
+			String dest = getDestination(source.getParentFile());
+			ops.addFile(source.getAbsolutePath(), dest, getConf());
+			metadata.setLink(dest + "/" + source.getName());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -131,7 +119,7 @@ public class MetadataService {
 
 	public void mkdir(File file) {
 		try {
-			ops.mkdir(file.getAbsolutePath().substring(this.startLocation.length()), getConf());
+			ops.mkdir(getDestination(file), getConf());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
