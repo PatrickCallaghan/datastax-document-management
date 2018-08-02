@@ -29,6 +29,8 @@ import com.datastax.tika.model.MetadataObject;
 
 public class MetadataService {
 	private static Logger logger = LoggerFactory.getLogger(MetadataService.class);
+
+	private String dsefs_base_dir;
 	private MetadataDao dao;
     private DSEFileSystemOperations ops = new DSEFileSystemOperations();
 
@@ -37,6 +39,7 @@ public class MetadataService {
 
 	public MetadataService(String startLocation) {		
 		String contactPointsStr = PropertyHelper.getProperty("contactPoints", "localhost");
+		dsefs_base_dir = PropertyHelper.getProperty("dsefsBaseDir", "/files");
 		this.dao = new MetadataDao(contactPointsStr.split(","));
 		this.startLocation = startLocation;
 	}	
@@ -92,11 +95,18 @@ public class MetadataService {
 			return extractMetadata(stream, originalURL.toURI().toString(), "URL");
 	    }
 	}
+
+	private String getDestination(File file) {
+		String dest = dsefs_base_dir + "/" + file.getAbsolutePath().substring(this.startLocation.length()+1);
+
+		return dest;
+	}
 	
 	public void sendFile(File source, MetadataObject metadata) {
 	    try {
-			ops.addFile(source.getAbsolutePath(), source.getAbsolutePath().substring(this.startLocation.length()), getConf());
-			metadata.setLink(source.getAbsolutePath().substring(this.startLocation.length() + 1));
+			String dest = getDestination(source.getParentFile());
+			ops.addFile(source.getAbsolutePath(), dest, getConf());
+			metadata.setLink(dest + "/" + source.getName());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -109,7 +119,7 @@ public class MetadataService {
 
 	public void mkdir(File file) {
 		try {
-			ops.mkdir(file.getAbsolutePath().substring(this.startLocation.length()), getConf());
+			ops.mkdir(getDestination(file), getConf());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
