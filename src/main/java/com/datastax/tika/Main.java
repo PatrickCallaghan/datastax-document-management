@@ -41,7 +41,7 @@ public class Main {
 		// For all docs			
 		processFiles(service, fileLocation);
 
-		//processLinks(service);
+		processLinks(service);
 		
 		timer.end();
 		logger.info("Test took " + timer.getTimeTakenSeconds() + " secs.");

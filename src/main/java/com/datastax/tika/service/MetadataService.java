@@ -118,7 +118,7 @@ public class MetadataService {
 	    	    
 	    try {
 			ops.addFile(source.getAbsolutePath(), source.getAbsolutePath().substring(this.startLocation.length()), getConf());
-			metadata.setLink(source.getAbsolutePath().substring(this.startLocation.length() + 1));
+			metadata.setLink(source.getAbsolutePath().substring(this.startLocation.length()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
