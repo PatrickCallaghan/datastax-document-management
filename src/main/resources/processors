@@ -1,0 +1,2 @@
+com.datastax.tika.service.FileProcessor
+com.datastax.tika.service.GitHubProcessor

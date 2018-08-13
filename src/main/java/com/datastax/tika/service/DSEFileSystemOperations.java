@@ -47,7 +47,7 @@ public class DSEFileSystemOperations {
 		Path path = new Path(dest);
 
 		if (fileSystem.exists(path)) {
-			logger.info("File " + dest + " already exists");
+			logger.error("File " + dest + " already exists");
 			return;
 		}
 

@@ -37,7 +37,6 @@ https://github.com/PatrickCallaghan/datastax-userinteractions-demo
 https://github.com/PatrickCallaghan/datastax-referencedata-example
 https://github.com/PatrickCallaghan/datastax-bulkloader-dse-example
 https://github.com/PatrickCallaghan/datastax-kafka-python
-https://github.com/PatrickCallaghan/datastax-spark-streaming-demo
 https://github.com/PatrickCallaghan/datastax-fraud-prevention
 https://github.com/PatrickCallaghan/datastax-global-store
 https://github.com/PatrickCallaghan/datastax-widerow-example
