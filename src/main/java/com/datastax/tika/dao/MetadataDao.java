@@ -2,9 +2,6 @@ package com.datastax.tika.dao;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.KeyspaceMetadata;
 import com.datastax.driver.core.Session;
@@ -14,11 +11,8 @@ import com.datastax.tika.model.MetadataObject;
 
 public class MetadataDao {
 
-	private static Logger logger = LoggerFactory.getLogger(MetadataDao.class);
 	private Session session;
 
-	private static String keyspaceName = "tika";
-	private static String testTable = keyspaceName + ".metadata";
 	private List<KeyspaceMetadata> keyspaces;
 	private Mapper<MetadataObject> metadataMapper;
 		

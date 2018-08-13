@@ -5,16 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.AutoDetectParser;
-import org.apache.tika.sax.BodyContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -69,35 +63,9 @@ public class FileProcessor extends TikaProcessor {
 
 	public MetadataObject process(String fileName) throws IOException, SAXException, TikaException {
 
-		File file = new File(fileName);
-	
-		BodyContentHandler handler = new BodyContentHandler(-1);
-		AutoDetectParser parser = new AutoDetectParser();
-		Metadata metadata = new Metadata();
-		MetadataObject metadataObject = new MetadataObject();
-
-		try (InputStream stream = FileUtils.openInputStream(file)) {
-			parser.parse(stream, handler, metadata);
-
-			metadataObject.setLastModified(metadata.getDate(Metadata.LAST_MODIFIED));
-			metadataObject.setContentType(metadata.get(Metadata.CONTENT_TYPE));
-			metadataObject.setCreatedDate(metadata.getDate(Metadata.DATE));
-			metadataObject.setDocumentId(UUID.randomUUID().toString());
-			metadataObject.setVersion(
-					Double.parseDouble(metadata.get("pdf:PDFVersion") != null ? metadata.get("pdf:PDFVersion") : "0"));
-			metadataObject.setContent(handler.toString());
-			metadataObject.setLink(file.getAbsolutePath());
-			metadataObject.setType("File");
-
-			Map<String, String> metadataMap = new HashMap<String, String>();
-			for (String name : metadata.names()) {
-				metadataMap.put("md_" + name, metadata.get(name));
-			}
-			metadataObject.setMetadataMap(metadataMap);
-			logger.info(metadata.toString());
-		}
-
-		return metadataObject;
+		File file = new File(fileName);	
+		InputStream stream = FileUtils.openInputStream(file);
+		return extractMetadata(stream, file.getAbsolutePath(), "File");
 	}
 
 
